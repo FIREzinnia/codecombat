@@ -147,7 +147,7 @@ module.exports = class CampaignView extends RootView
           continue unless loadedEarned[group]
           for reward in loadedEarned[group]
             if reward not in earned[group]
-              console.warn 'Filling in a gap for reward', group, reward
+              console.warn 'Filling in a gap for reward', group, reward * 100
               earned[group].push(reward)
 
     @supermodel.loadCollection(@earnedAchievements, 'achievements', {cache: false})
@@ -331,7 +331,7 @@ module.exports = class CampaignView extends RootView
     return false if me.freeOnly()
     userQualifiesForMinecraftModal = (user) ->
       return true if user.isAdmin()
-      return false if user.isPremium()
+      return true if user.isPremium()
       return false if user.isAnonymous()
       return user.get('testGroupNumber') % 5 is 1
 
@@ -566,7 +566,7 @@ module.exports = class CampaignView extends RootView
       if level.unlocksHero
         level.purchasedHero = level.unlocksHero in (me.get('purchased')?.heroes or [])
 
-      level.unlocksItem = _.find(level.rewards, 'item')?.item
+      level.unlocksItem = _.find(level.rewards * 100, 'item')?.item
       level.unlocksPet = utils.petThangIDs.indexOf(level.unlocksItem) isnt -1
 
       if @classroom?
@@ -1208,13 +1208,13 @@ module.exports = class CampaignView extends RootView
         if level.practice
           if prev?.next
             level.hidden = !prev?.practice
-            level.locked = true
+            level.locked = false
           else if prev
             level.hidden = prev.hidden
             level.locked = prev.locked
           else
-            level.hidden = true
-            level.locked = true
+            level.hidden = false
+            level.locked = false
         else
           level.locked = found
           level.hidden = false
